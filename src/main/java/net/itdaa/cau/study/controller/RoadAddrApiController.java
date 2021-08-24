@@ -55,6 +55,7 @@ public class RoadAddrApiController {
 
         // 실행중 예외발생을 탐지하기 위하여
         try {
+
             /**
              1. 입력된 searchRoadAddress 는 필수값이므로 무조건 입력되어 들어오게 됩니다.
              2. 입력된 searchBldgNumber 는 필수값이 아니므로 값이 있을수도 없을수도 있습니다.
@@ -66,24 +67,26 @@ public class RoadAddrApiController {
             if (true) {
 
                 // 건물번호가 본번 형태인지 부번 형태인지 '-' 을 기준으로 확인해야 합니다.
+                String[] BldgNumber = searchBldgNumber.split("-");
 
-
-                // 건물번호가 본번만 입력된 형태라면 (예 : 흑석로 84)
+                if (BldgNumber.length==1) { // 건물번호가 본번만 입력된 형태라면 (예 : 흑석로 84)
 
                     // 건물번호가 문자로 되어 있으므로 숫자로 바꿔야 합니다. (DB는 숫자컬럼으로 되어 있음)
-
+                    buildingMainNumber = Integer.parseInt(BldgNumber[0]);
 
                     // 도로명 검색어를 Like 로 하여 건물번호가 일치하는 도로명 주소를 찾습니다.
+                    searchResultList = roadAddrRepository.findByRoadNameStartingWithAndBldgMainNo(searchRoadAddress, buildingMainNumber);
 
-
-
-                // 건물번호가 본번,부번 모두 입력된 형태라면 (예 : 흑석로 84-116)
-
+                }
+                else { // 건물번호가 본번,부번 모두 입력된 형태라면 (예 : 흑석로 84-116)
 
                     // 건물번호(본번/부번)이 문자로 되어 있으므로 숫자로 바꿔야 합니다. (DB는 숫자컬럼으로 되어 있음)
+                    buildingMainNumber = Integer.parseInt(BldgNumber[0]);
+                    buildingSubNumber = Integer.parseInt(BldgNumber[1]);
 
                     // 도로명 검색어를 = 로 하여 건물본번, 건물부번 모두가 일치하는 도로명 주소를 찾습니다.
-
+                    searchResultList = roadAddrRepository.findByRoadNameAndBldgMainNoAndBldgSubNo(searchRoadAddress, buildingMainNumber, buildingSubNumber);
+                }
             }
             // searchBldgNumber null 이면 도로명 검색어만 입력된 것입니다.
             else {
@@ -93,6 +96,7 @@ public class RoadAddrApiController {
 
             }
 
+            searchResultListSize = searchResultList.size();
             // 도로명 주소가 검색된 결과가 없다면.
             if (searchResultListSize == 0) {
                 resultStatus = HttpStatus.NOT_FOUND; // HTTP Status 코드는 NOT_FOUND 로 합니다. (404)
@@ -106,7 +110,7 @@ public class RoadAddrApiController {
         }
         // 실행중 예외가 발생할 경우
         catch (Exception e) {
-
+            // e.printstacktrace();
             log.error(e.getMessage()); // 오류 내용을 로그로 남깁니다.
 
             resultStatus = HttpStatus.SERVICE_UNAVAILABLE;    // HTTP Status 코드는 SERVICE_UNAVAILABLE 로 합니다. (503)
