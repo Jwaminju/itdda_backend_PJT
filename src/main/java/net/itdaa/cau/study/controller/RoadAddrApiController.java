@@ -36,12 +36,14 @@ public class RoadAddrApiController {
     @ApiOperation(value="조회할 도로명 주소(전체 or 일부)", notes="(도로명 주소의 일부 정보 or 정확한 주소)로 해당하는 도로명주소를 조회합니다.")
     @GetMapping(value="/roadAddr")  // API 를 호출하기 위한 주소 값이며 상위 주소의 하위주소값입니다. 예: http://localhost:8080/api/roadAddr)
     @ApiImplicitParams({
-           @ApiImplicitParam(name = "searchRoadAddr", value = "검색할 도로명", required = true, dataType = "String", defaultValue = ""),
-           @ApiImplicitParam(name = "searchRoadAddrBldgNumber", value = "검색할 빌딩명", required = false, dataType = "String", defaultValue = "")
+            @ApiImplicitParam(name = "searchRoadAddr", value = "검색할 도로명", required = true, dataType = "String", defaultValue = ""),
+            @ApiImplicitParam(name = "searchRoadAddrBldgNumber", value = "검색할 빌딩명", required = false, dataType = "String", defaultValue = "")
     })
     public ResponseEntity<?> getRoadAddr(@RequestParam(value = "searchRoadAddr") String searchRoadAddress
-                                        ,@RequestParam(value = "searchRoadAddrBldgNumber", required = false)  String searchBldgNumber) {
+            ,@RequestParam(value = "searchRoadAddrBldgNumber", required = false)  String searchBldgNumber) {
 
+        log.info("-----------------------road Address-----------------------"+ searchRoadAddress);
+        searchRoadAddress = "세종대로";
 
         Integer buildingMainNumber = 0;      // DB에 조회하기 위한 도로명주소 건물본번
         Integer buildingSubNumber = 0;       // DB에 조회하기 위한 도로명주소 건물부번
@@ -52,7 +54,7 @@ public class RoadAddrApiController {
         Map<String,Object> returnMap = new HashMap<>();          // 실제 API Return 되는 값이 들어가는 Map 객체 입니다.
 
         int searchResultListSize = 0; // 최종적으로 DB에서 도로명 주소를 찾은 결과의 갯수
-
+        log.info("-----------------------road Address!-----------------------"+ searchRoadAddress);
         // 실행중 예외발생을 탐지하기 위하여
         try {
 
@@ -64,7 +66,7 @@ public class RoadAddrApiController {
              2-3. 만약 searchBldgNumber 가 입력되고, 그 값에 '-' 이 포함되면 '건물 본번 - 건물 부번' 인 형태입니다.
              */
             // searchBldgNumber null 이 아니면 건물번호가 입력된 것 입니다.
-            if (true) {
+            if (searchBldgNumber != null) {
 
                 // 건물번호가 본번 형태인지 부번 형태인지 '-' 을 기준으로 확인해야 합니다.
                 String[] BldgNumber = searchBldgNumber.split("-");
@@ -106,11 +108,11 @@ public class RoadAddrApiController {
             returnMap.put(resRoadAddr, null);  // return 주소정보는 조회 결과를 넣습니다.
             returnMap.put(resCnt, null); // return 건수정보는 조회 결과의 건수를 넣습니다.
 
-            throw new Exception();
+            //throw new Exception();
         }
         // 실행중 예외가 발생할 경우
         catch (Exception e) {
-            // e.printstacktrace();
+
             log.error(e.getMessage()); // 오류 내용을 로그로 남깁니다.
 
             resultStatus = HttpStatus.SERVICE_UNAVAILABLE;    // HTTP Status 코드는 SERVICE_UNAVAILABLE 로 합니다. (503)
