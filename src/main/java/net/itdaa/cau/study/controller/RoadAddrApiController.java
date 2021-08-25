@@ -49,7 +49,7 @@ public class RoadAddrApiController {
 
         HttpStatus resultStatus = HttpStatus.OK;   // 기본적으로 정상적으로 조회가 된다는 가정하에 반환하는 HTTP Status 값은 200 (OK) 입니다.
 
-        List<RoadAddress> searchResultList = new ArrayList<>();  // DB 조회 후 값이 있을 경우 RoadAddress 객체의 값 List 입니다.
+        List<RoadAddress> searchResultList;  // DB 조회 후 값이 있을 경우 RoadAddress 객체의 값 List 입니다.
         Map<String,Object> returnMap = new HashMap<>();          // 실제 API Return 되는 값이 들어가는 Map 객체 입니다.
 
         int searchResultListSize = 0; // 최종적으로 DB에서 도로명 주소를 찾은 결과의 갯수
