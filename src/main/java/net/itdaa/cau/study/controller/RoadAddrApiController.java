@@ -43,18 +43,16 @@ public class RoadAddrApiController {
             ,@RequestParam(value = "searchRoadAddrBldgNumber", required = false)  String searchBldgNumber) {
 
         log.info("-----------------------road Address-----------------------"+ searchRoadAddress);
-        searchRoadAddress = "세종대로";
 
         Integer buildingMainNumber = 0;      // DB에 조회하기 위한 도로명주소 건물본번
         Integer buildingSubNumber = 0;       // DB에 조회하기 위한 도로명주소 건물부번
 
         HttpStatus resultStatus = HttpStatus.OK;   // 기본적으로 정상적으로 조회가 된다는 가정하에 반환하는 HTTP Status 값은 200 (OK) 입니다.
 
-        List<RoadAddress> searchResultList;  // DB 조회 후 값이 있을 경우 RoadAddress 객체의 값 List 입니다.
+        List<RoadAddress> searchResultList = new ArrayList<>();  // DB 조회 후 값이 있을 경우 RoadAddress 객체의 값 List 입니다.
         Map<String,Object> returnMap = new HashMap<>();          // 실제 API Return 되는 값이 들어가는 Map 객체 입니다.
 
         int searchResultListSize = 0; // 최종적으로 DB에서 도로명 주소를 찾은 결과의 갯수
-        log.info("-----------------------road Address!-----------------------"+ searchRoadAddress);
         // 실행중 예외발생을 탐지하기 위하여
         try {
 
@@ -97,7 +95,7 @@ public class RoadAddrApiController {
                 searchResultList = roadAddrRepository.findByRoadNameStartingWith(searchRoadAddress);
 
             }
-
+            log.info("로드"+searchResultList);
             searchResultListSize = searchResultList.size();
             // 도로명 주소가 검색된 결과가 없다면.
             if (searchResultListSize == 0) {
@@ -105,8 +103,8 @@ public class RoadAddrApiController {
             }
 
             returnMap.put(resMsg, "정상처리되었습니다.");    // return 메세지는 "정상" 으로 하고
-            returnMap.put(resRoadAddr, null);  // return 주소정보는 조회 결과를 넣습니다.
-            returnMap.put(resCnt, null); // return 건수정보는 조회 결과의 건수를 넣습니다.
+            returnMap.put(resRoadAddr, searchResultList);  // return 주소정보는 조회 결과를 넣습니다.
+            returnMap.put(resCnt, searchResultListSize); // return 건수정보는 조회 결과의 건수를 넣습니다.
 
             //throw new Exception();
         }
